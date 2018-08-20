@@ -1,10 +1,10 @@
 const express = require("express");
 const OAuth = require("oauth");
 
-const twitterKey = 'SIv1yZ3UmAEYZtTTXvFBF1CiW';
-const twitterSecret = 'A8nfJZ0ETRhDToCo994kzR4RhyPcTQV4ebp6REnAMelUipMh1y';
-const token = '72047073-mvMnGWB6shRZkzs7NXTwjArtqJz8y0gBFkPxYeB8y';
-const secret = 'VJOvJJvtdA9kX4WRf4IxwvokJ5uu98m83MoLjlyL93OiG';
+const twitterKey = ''; //-- twitter key
+const twitterSecret = ''; //-- twitter secret
+const token = ''; //-- token
+const secret = ''; //-- secret
 
 const oauth = new OAuth.OAuth(
   "https://api.twitter.com/oauth/request_token",
