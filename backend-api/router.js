@@ -1,10 +1,10 @@
 const express = require("express");
 const OAuth = require("oauth");
 
-const twitterKey = '';
-const twitterSecret = '';
-const token = '';
-const secret = '';
+const twitterKey = ''; //-- twitter key
+const twitterSecret = ''; //-- twitter secret
+const token = ''; //-- token
+const secret = ''; //-- secret
 
 const oauth = new OAuth.OAuth(
   "https://api.twitter.com/oauth/request_token",
