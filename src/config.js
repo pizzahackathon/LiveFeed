@@ -3,7 +3,7 @@ const isProd = false
 // ----- Twitter config
 const twitter = {
   queryParam: ['pizzahackathon', 'pizzahack', 'pizzahackaton'],
-  endPoint: 'END POINT' //--- add end point here
+  endPoint: 'http://localhost:3000/loadTweets/' //--- add end point here
 }
 
 // ----- Price chart btc/eth config
