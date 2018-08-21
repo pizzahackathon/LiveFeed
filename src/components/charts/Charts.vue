@@ -1,11 +1,11 @@
 <template>
   <div class="is-fluid">
     <div class="box">
-      <h3>BTC Price</h3>
+      <h3>BTC Price - {{btcCurrentPrice}}</h3>
       <canvas id="btc-chart"></canvas>
     </div>
     <div class="box">
-      <h3>ETH Price</h3>
+      <h3>ETH Price - {{ethCurrentPrice}}</h3>
       <canvas id="eth-chart"></canvas>
     </div>
   </div>
@@ -30,7 +30,13 @@ export default {
       scale: 1,
       btcValues: [],
       ethValues: [],
-      instance: null
+      instance: null,
+      btcMinPrice: config.chart.btcMin,
+      btcMaxPrice: config.chart.btcMax,
+      ethMinPrice: config.chart.ethMin,
+      ethMaxPrice: config.chart.ethMax,
+      btcCurrentPrice: 0,
+      ethCurrentPrice: 0
     }
   },
   async mounted () {
@@ -42,7 +48,6 @@ export default {
     })
     this.samples = 20
     this.speed = 250
-    this.timeout = this.samples * this.speed
     this.addEmptyValues(this.btcValues, this.samples)
     this.addEmptyValues(this.ethValues, this.samples)
     this.initialize()
@@ -73,9 +78,7 @@ export default {
             data: this.btcValues,
             backgroundColor: 'rgba(255, 99, 132, 0.1)',
             borderColor: 'rgb(255, 99, 132)',
-            borderWidth: 2,
-            lineTension: 0.25,
-            pointRadius: 0
+            borderWidth: 2
           }]
         },
         options: {
@@ -92,8 +95,9 @@ export default {
             }],
             yAxes: [{
               ticks: {
-                max: config.chart.btcMax,
-                min: config.chart.btcMin
+                max: this.btcMaxPrice,
+                min: this.btcMinPrice,
+                stepSize: 0.25
               }
             }]
           }
@@ -122,8 +126,9 @@ export default {
             }],
             yAxes: [{
               ticks: {
-                max: config.chart.ethMax,
-                min: config.chart.ethMin
+                max: this.ethMaxPrice,
+                min: this.ethMinPrice,
+                stepSize: 0.25
               }
             }]
           }
@@ -141,6 +146,15 @@ export default {
     updateCharts () {
       this.charts.forEach(
         (chart) => {
+          // chart.config.options.scales.yAxes[0].ticks.max = this.ethMaxPrice
+          // console.log('chart: ', chart.canvas.id)
+          if (chart.canvas.id === 'btc-chart') {
+            chart.config.options.scales.yAxes[0].ticks.max = this.btcMaxPrice
+            chart.config.options.scales.yAxes[0].ticks.min = this.btcMinPrice
+          }else if (chart.canvas.id === 'eth-chart') {
+            chart.config.options.scales.yAxes[0].ticks.max = this.ethMaxPrice
+            chart.config.options.scales.yAxes[0].ticks.min = this.ethMinPrice
+          }
           chart.update()
         }
       )
@@ -152,6 +166,9 @@ export default {
             x: new Date(),
             y: price
           })
+          this.btcCurrentPrice = price
+          this.btcMaxPrice = price + 2.25
+          this.btcMinPrice = price - 2.25
           this.btcValues.shift()
         }
       )
@@ -163,18 +180,12 @@ export default {
             x: new Date(),
             y: price
           })
+          this.ethCurrentPrice = price
+          this.ethMaxPrice = price + 2.25
+          this.ethMinPrice = price - 2.25
           this.ethValues.shift()
         }
       )
-    },
-    rescale () {
-      let padding = [];
-      
-      this.addEmptyValues(padding, 10);
-      this.btcValues.splice.apply(this.btcValues, padding);
-      this.ethValues.splice.apply(this.ethValues, padding);
-      
-      this.scale++;
     },
     advance () {
       if (this.values[0] !== null && this.scale < 4) {
@@ -185,7 +196,6 @@ export default {
       this.progressBTCPrice()
       this.progressETHPrice()
       this.updateCharts()
-      this.rescale()
     },
     sleep (time) {
       return new Promise(resolve => setTimeout(resolve, time * 1000))
