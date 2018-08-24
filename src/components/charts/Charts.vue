@@ -38,7 +38,7 @@ export default {
       btcCurrentPrice: 0,
       ethCurrentPrice: 0,
       btcPercentChange24h: 0,
-      ethPercentChange24h: 0
+      ethPercentChange24h: 0,
     }
   },
   async mounted () {
@@ -56,12 +56,14 @@ export default {
     if (this.btcValues.length === 0) {
       this.addEmptyValues(this.btcValues, this.samples)
     }
+    this.updateBTCMinMax()
 
     // Load ETH
     this.ethValues = this.loadETHPriceListFromStorage()
     if (this.ethValues.length === 0) {
       this.addEmptyValues(this.ethValues, this.samples)
     }
+    this.updateETHMinMax()
 
     this.initialize()
     if (config.isProd) {
@@ -110,7 +112,8 @@ export default {
               ticks: {
                 max: this.btcMaxPrice,
                 min: this.btcMinPrice,
-                stepSize: 0.25
+                // stepSize: 0.25,
+                maxTicksLimit: 10
               }
             }]
           }
@@ -141,7 +144,8 @@ export default {
               ticks: {
                 max: this.ethMaxPrice,
                 min: this.ethMinPrice,
-                stepSize: 0.25
+                // stepSize: 0.25,
+                maxTicksLimit: 10
               }
             }]
           }
@@ -181,14 +185,25 @@ export default {
             y: price
           })
           this.btcCurrentPrice = price
-          this.btcMaxPrice = price + 2.25
-          this.btcMinPrice = price - 2.25
+          this.updateBTCMinMax()
           this.btcValues.shift()
 
           this.btcPercentChange24h = data.quotes.USD.percent_change_24h
         }
       )
       this.saveBTCPriceListToStorage()
+    },
+    updateBTCMinMax () {
+      this.btcMaxPrice = Math.max(...this.btcValues.map(btcValue => btcValue.y))
+      this.btcMinPrice = Math.min(...this.btcValues.filter(btcValue => btcValue.y !== null && btcValue.y !== 0).map(btcValue => btcValue.y))
+      console.log(`btcMaxPrice ${this.btcMaxPrice}`)
+      console.log(`btcMinPrice ${this.btcMinPrice}`)
+    },
+    updateETHMinMax () {
+      this.ethMaxPrice = Math.max(...this.ethValues.map(ethValue => ethValue.y))
+      this.ethMinPrice = Math.min(...this.ethValues.filter(ethValue => ethValue.y !== null && ethValue.y !== 0).map(ethValue => ethValue.y))
+      console.log(`ethMaxPrice ${this.ethMaxPrice}`)
+      console.log(`ethMinPrice ${this.ethMinPrice}`)
     },
     progressETHPrice () {
       this.loadData('1027/').then(
@@ -199,8 +214,7 @@ export default {
             y: price
           })
           this.ethCurrentPrice = price
-          this.ethMaxPrice = price + 2.25
-          this.ethMinPrice = price - 2.25
+          this.updateETHMinMax()
           this.ethValues.shift()
 
           this.ethPercentChange24h = data.quotes.USD.percent_change_24h
