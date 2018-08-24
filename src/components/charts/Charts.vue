@@ -1,11 +1,11 @@
 <template>
   <div class="is-fluid">
     <div class="box">
-      <h3>BTC Price - {{btcCurrentPrice}}</h3>
+      <h3 class="price-header">BTC Price - <span class="price">{{btcCurrentPrice}}</span> <span class="price-diff gain" v-bind:class="{ lost: btcPercentChange24h < 0 }">({{btcPercentChange24h}}%)</span></h3>
       <canvas id="btc-chart"></canvas>
     </div>
     <div class="box">
-      <h3>ETH Price - {{ethCurrentPrice}}</h3>
+      <h3 class="price-header">ETH Price - <span class="price">{{ethCurrentPrice}}</span> <span class="price-diff gain" v-bind:class="{ lost: ethPercentChange24h < 0 }">({{ethPercentChange24h}}%)</span></h3>
       <canvas id="eth-chart"></canvas>
     </div>
   </div>
@@ -36,7 +36,9 @@ export default {
       ethMinPrice: config.chart.ethMin,
       ethMaxPrice: config.chart.ethMax,
       btcCurrentPrice: 0,
-      ethCurrentPrice: 0
+      ethCurrentPrice: 0,
+      btcPercentChange24h: 0,
+      ethPercentChange24h: 0
     }
   },
   async mounted () {
@@ -46,7 +48,7 @@ export default {
         'Content-Type': 'application/json'
       }
     })
-    this.samples = 20
+    this.samples = 2000
     this.speed = 250
     this.addEmptyValues(this.btcValues, this.samples)
     this.addEmptyValues(this.ethValues, this.samples)
@@ -161,7 +163,8 @@ export default {
     },
     progressBTCPrice () {
       this.loadData('1/').then(
-        (price) => {
+        (data) => {
+          var price = data.quotes.USD.price
           this.btcValues.push({
             x: new Date(),
             y: price
@@ -170,12 +173,15 @@ export default {
           this.btcMaxPrice = price + 2.25
           this.btcMinPrice = price - 2.25
           this.btcValues.shift()
+
+          this.btcPercentChange24h = data.quotes.USD.percent_change_24h
         }
       )
     },
     progressETHPrice () {
       this.loadData('1027/').then(
-        (price) => {
+        (data) => {
+          var price = data.quotes.USD.price
           this.ethValues.push({
             x: new Date(),
             y: price
@@ -184,6 +190,8 @@ export default {
           this.ethMaxPrice = price + 2.25
           this.ethMinPrice = price - 2.25
           this.ethValues.shift()
+
+          this.ethPercentChange24h = data.quotes.USD.percent_change_24h
         }
       )
     },
@@ -202,8 +210,32 @@ export default {
     },
     async loadData (endpoint) {
       const response = await this.instance.get(endpoint)
-      return response.data.data.quotes.USD.price
+      return response.data.data
     }
   }
 }
 </script>
+
+<style>
+.price-header {
+  font-size: 2em;
+  font-weight: bold;
+}
+
+.price {
+  font-weight: bold;
+}
+
+.price-diff {
+  font-weight: bold;
+  margin-left: 12px;
+}
+
+.gain {
+  color: green;
+}
+
+.lost {
+  color: red;
+}
+</style>
