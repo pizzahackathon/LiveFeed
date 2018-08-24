@@ -46,10 +46,21 @@ export default {
         'Content-Type': 'application/json'
       }
     })
-    this.samples = 20
+    this.samples = 2000
     this.speed = 250
-    this.addEmptyValues(this.btcValues, this.samples)
-    this.addEmptyValues(this.ethValues, this.samples)
+    
+    // Load BTC
+    this.btcValues = this.loadBTCPriceListFromStorage()
+    if (this.btcValues.length === 0) {
+      this.addEmptyValues(this.btcValues, this.samples)
+    }
+
+    // Load ETH
+    this.ethValues = this.loadETHPriceListFromStorage()
+    if (this.ethValues.length === 0) {
+      this.addEmptyValues(this.ethValues, this.samples)
+    }
+
     this.initialize()
     if (config.isProd) {
       this.runChartPriceProd()
@@ -172,6 +183,7 @@ export default {
           this.btcValues.shift()
         }
       )
+      this.saveBTCPriceListToStorage()
     },
     progressETHPrice () {
       this.loadData('1027/').then(
@@ -186,6 +198,7 @@ export default {
           this.ethValues.shift()
         }
       )
+      this.saveETHPriceListToStorage()
     },
     advance () {
       if (this.values[0] !== null && this.scale < 4) {
@@ -203,7 +216,27 @@ export default {
     async loadData (endpoint) {
       const response = await this.instance.get(endpoint)
       return response.data.data.quotes.USD.price
-    }
+    },
+    saveBTCPriceListToStorage () {
+      localStorage.setItem('BTCPriceList', JSON.stringify(this.btcValues));
+    },
+    saveETHPriceListToStorage () {
+      localStorage.setItem('ETHPriceList', JSON.stringify(this.ethValues));
+    },
+    loadBTCPriceListFromStorage () {
+      if (localStorage.getItem('BTCPriceList')) {
+        return JSON.parse(localStorage.getItem('BTCPriceList'));
+      } else {
+        return []
+      }
+    },
+    loadETHPriceListFromStorage () {
+      if (localStorage.getItem('ETHPriceList')) {
+        return JSON.parse(localStorage.getItem('ETHPriceList'));
+      } else {
+        return []
+      }
+    },
   }
 }
 </script>
