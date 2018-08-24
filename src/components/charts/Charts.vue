@@ -49,7 +49,7 @@ export default {
       }
     })
     this.samples = 2000
-    this.speed = 250
+    this.speed = 2000
     
     // Load BTC
     this.btcValues = this.loadBTCPriceListFromStorage()
