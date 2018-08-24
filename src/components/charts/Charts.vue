@@ -166,11 +166,11 @@ export default {
           // chart.config.options.scales.yAxes[0].ticks.max = this.ethMaxPrice
           // console.log('chart: ', chart.canvas.id)
           if (chart.canvas.id === 'btc-chart') {
-            chart.config.options.scales.yAxes[0].ticks.max = this.btcMaxPrice
-            chart.config.options.scales.yAxes[0].ticks.min = this.btcMinPrice
+            chart.config.options.scales.yAxes[0].ticks.max = this.btcMaxPrice * 1.01
+            chart.config.options.scales.yAxes[0].ticks.min = this.btcMinPrice * 0.99
           }else if (chart.canvas.id === 'eth-chart') {
-            chart.config.options.scales.yAxes[0].ticks.max = this.ethMaxPrice
-            chart.config.options.scales.yAxes[0].ticks.min = this.ethMinPrice
+            chart.config.options.scales.yAxes[0].ticks.max = this.ethMaxPrice * 1.01
+            chart.config.options.scales.yAxes[0].ticks.min = this.ethMinPrice * 0.99
           }
           chart.update()
         }
