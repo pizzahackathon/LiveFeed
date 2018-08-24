@@ -97,7 +97,7 @@ export default {
         options: {
           responsive: true,
           animation: {
-            duration: this.speed * 1.5,
+            duration: this.speed * 0.15,
             easing: 'linear'
           },
           legend: false,
@@ -128,7 +128,7 @@ export default {
         options: {
           responsive: true,
           animation: {
-            duration: this.speed * 1.5,
+            duration: this.speed * 0.15,
             easing: 'linear'
           },
           legend: false,
